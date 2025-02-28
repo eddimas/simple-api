@@ -124,5 +124,5 @@ gh repo fork REPOSITORY --remote-name "main-remote-repo"
 
 ### Solution diagram
 
-![simple-api architecture](images/simple-api.png)  
+![simple-api architecture](Images/simple-api.png)
 **Figure 1:** Architecture diagram of the simple API.
