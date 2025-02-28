@@ -113,6 +113,14 @@ gh repo fork REPOSITORY --remote-name "main-remote-repo"
 
 ## Next Steps
 
-- Implement real-time processing with AWS Kinesis.
+- Add unit tests for Lambda functions.
+- Implement health checks and error handling.
 - Add monitoring dashboards with CloudWatch.
 - Optimize costs with Lambda provisioned concurrency.
+
+## Appendix
+
+### Solution diagram
+
+![simple-api architecture](images/simple-api.png)  
+**Figure 1:** Architecture diagram of the simple API.
