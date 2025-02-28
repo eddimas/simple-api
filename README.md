@@ -18,6 +18,7 @@ The system is designed with best practices for Infrastructure as Code (IaC), CI/
 
 **Endpoint:** `POST /data`  
 **Description:** Accepts event data from simulated devices and validates the input  
+**Request Headers:** `x-api-key: ${SECRET-KEY}$`
 **Request Body (JSON Example)**
 
 ```json
@@ -39,6 +40,7 @@ The system is designed with best practices for Infrastructure as Code (IaC), CI/
 
 **Endpoint:** `GET /`  
 **Description:** Fetches processed data for a specific device from .  
+**Request Headers:** `x-api-key: ${SECRET-KEY}$`
 **Response Example:**
 
 ```
