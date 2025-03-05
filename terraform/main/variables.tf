@@ -37,3 +37,14 @@ variable "api_gw_path" {
   type    = string
   default = "api"
 }
+
+variable "dynamodb_table_name" {
+  type    = string
+  default = "ProcessedData"
+}
+
+variable "dynamodb_table_hash_key" {
+  type    = string
+  default = "device_id"
+
+}
