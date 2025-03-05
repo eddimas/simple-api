@@ -24,9 +24,11 @@ resource "aws_api_gateway_integration" "get_integration" {
   resource_id             = aws_api_gateway_resource.resource.id
   http_method             = aws_api_gateway_method.get_method.http_method
   type                    = "AWS_PROXY"
-  integration_http_method = "POST" # ✅ FIXED
+  integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["get"].invoke_arn
   credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole"
+
+  depends_on = [aws_api_gateway_method.get_method] # ✅ Ensure GET method exists first
 }
 
 # Secure POST Method with API Key
@@ -38,17 +40,18 @@ resource "aws_api_gateway_method" "post_method" {
   api_key_required = true
 }
 
-# Integrate DELETE Method with AWS Lambda
+# Integrate POST Method with AWS Lambda
 resource "aws_api_gateway_integration" "post_integration" {
   rest_api_id             = aws_api_gateway_rest_api.device_event_api.id
   resource_id             = aws_api_gateway_resource.resource.id
   http_method             = aws_api_gateway_method.post_method.http_method
   type                    = "AWS_PROXY"
-  integration_http_method = "POST" # ✅ FIXED
+  integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["post"].invoke_arn
   credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole"
-}
 
+  depends_on = [aws_api_gateway_method.post_method] # ✅ Ensure POST method exists first
+}
 
 # Secure DELETE Method with API Key
 resource "aws_api_gateway_method" "delete_method" {
@@ -65,7 +68,9 @@ resource "aws_api_gateway_integration" "delete_integration" {
   resource_id             = aws_api_gateway_resource.resource.id
   http_method             = aws_api_gateway_method.delete_method.http_method
   type                    = "AWS_PROXY"
-  integration_http_method = "POST" # ✅ FIXED
+  integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["delete"].invoke_arn
-  credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole" # NEW
+  credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole"
+
+  depends_on = [aws_api_gateway_method.delete_method] # ✅ Ensure DELETE method exists first
 }
