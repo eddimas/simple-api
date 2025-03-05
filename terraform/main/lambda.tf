@@ -10,7 +10,7 @@ resource "aws_lambda_function" "lambda_functions" {
   function_name = each.key
   runtime       = "python3.8"
   handler       = "${each.key}/device_data.lambda_handler"
-  s3_bucket     = aws_s3_bucket.lambda_bucket.id
+  s3_bucket     = var.bucket_data_name
   s3_key        = "${each.key}.zip"
   role          = aws_iam_role.lambda_exec.arn
 
