@@ -59,22 +59,28 @@ jobs:
         run: |
           mkdir -p lambda_package/get
           mkdir -p lambda_package/post
+          mkdir -p lambda_package/delete
 
           cp lambda/get/device_data.py lambda_package/get/
           cp lambda/post/device_data.py lambda_package/post/
+          cp lambda/post/device_data.py lambda_package/delete/
 
           pip install -r requirements.txt -t lambda_package/get/
           pip install -r requirements.txt -t lambda_package/post/
+          pip install -r requirements.txt -t lambda_package/delete/
 
           cd lambda_package/get
           zip -r ../../get.zip .
           cd ../post
           zip -r ../../post.zip .
+          cd ../delete
+          zip -r ../../delete.zip .
 
       - name: Upload Lambda ZIPs to S3
         run: |
           aws s3 cp get.zip s3://device-raw-data-bucket/
           aws s3 cp post.zip s3://device-raw-data-bucket/
+          aws s3 cp delete.zip s3://device-raw-data-bucket/
 
   terraform:
     name: Provision Infrastructure
@@ -99,7 +105,7 @@ jobs:
 
       - name: Initialize Terraform
         working-directory: terraform/main
-        run: terraform init -reconfigure
+        run: terraform init
 
       - name: Apply Terraform
         working-directory: terraform/main
