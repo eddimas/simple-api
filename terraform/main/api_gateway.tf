@@ -25,7 +25,7 @@ resource "aws_api_gateway_integration" "get_integration" {
   http_method             = aws_api_gateway_method.get_method.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.data_statistics.invoke_arn
+  uri                     = aws_lambda_function.post.invoke_arn
 }
 
 # Secure POST Method with API Key
@@ -44,5 +44,5 @@ resource "aws_api_gateway_integration" "post_integration" {
   http_method             = aws_api_gateway_method.post_method.http_method
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.event_processor.invoke_arn
+  uri                     = aws_lambda_function.get.invoke_arn
 }

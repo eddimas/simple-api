@@ -1,3 +1,4 @@
+# IAM Role for Lambda Execution
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_execution_role"
   assume_role_policy = jsonencode({
@@ -12,6 +13,7 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
+# IAM Policy for S3 Access
 resource "aws_iam_policy" "s3_access_policy" {
   name        = "s3_access_policy"
   description = "IAM policy for accessing S3 bucket"
@@ -29,6 +31,7 @@ resource "aws_iam_policy" "s3_access_policy" {
   })
 }
 
+# IAM Policy for DynamoDB Access
 resource "aws_iam_policy" "lambda_dynamodb_policy" {
   name        = "lambda_dynamodb_access"
   description = "Allow Lambda to write to DynamoDB"
@@ -49,27 +52,31 @@ resource "aws_iam_policy" "lambda_dynamodb_policy" {
 EOF
 }
 
+# Attach DynamoDB Policy to Lambda Role
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_dynamodb_policy.arn
 }
 
+# Attach AWS Managed Policy for Lambda Basic Execution Role
 resource "aws_iam_policy_attachment" "lambda_policy" {
   name       = "lambda_policy_attachment"
   roles      = [aws_iam_role.lambda_exec.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# Attach S3 Access Policy to Lambda Role
 resource "aws_iam_policy_attachment" "lambda_s3_policy_attachment" {
   name       = "lambda_s3_policy_attachment"
   roles      = [aws_iam_role.lambda_exec.name]
   policy_arn = aws_iam_policy.s3_access_policy.arn
 }
 
+# Lambda Permissions for API Gateway Invocation
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.event_processor.function_name
+  function_name = module.aws_lambda_function.get.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.device_event_api.execution_arn}/*/*"
 }
@@ -77,7 +84,15 @@ resource "aws_lambda_permission" "apigw_lambda" {
 resource "aws_lambda_permission" "apigw_statistics_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.data_statistics.function_name
+  function_name = module.aws_lambda_function.post.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.device_event_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_delete_lambda" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = module.aws_lambda_function.delete.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.device_event_api.execution_arn}/*/*"
 }

@@ -57,24 +57,24 @@ jobs:
 
       - name: Install dependencies and package Lambda functions
         run: |
-          mkdir -p lambda_package/event_processor
-          mkdir -p lambda_package/data_statistics
+          mkdir -p lambda_package/get
+          mkdir -p lambda_package/post
 
-          cp lambda/event_processor/lambda_function.py lambda_package/event_processor/
-          cp lambda/data_statistics/statistics_function.py lambda_package/data_statistics/
+          cp lambda/get/device_data.py lambda_package/get/
+          cp lambda/post/device_data.py lambda_package/post/
 
-          pip install -r requirements.txt -t lambda_package/event_processor/
-          pip install -r requirements.txt -t lambda_package/data_statistics/
+          pip install -r requirements.txt -t lambda_package/get/
+          pip install -r requirements.txt -t lambda_package/post/
 
-          cd lambda_package/event_processor
-          zip -r ../../event_processor.zip .
-          cd ../data_statistics
-          zip -r ../../data_statistics.zip .
+          cd lambda_package/get
+          zip -r ../../get.zip .
+          cd ../post
+          zip -r ../../post.zip .
 
       - name: Upload Lambda ZIPs to S3
         run: |
-          aws s3 cp event_processor.zip s3://device-raw-data-bucket/
-          aws s3 cp data_statistics.zip s3://device-raw-data-bucket/
+          aws s3 cp get.zip s3://device-raw-data-bucket/
+          aws s3 cp post.zip s3://device-raw-data-bucket/
 
   terraform:
     name: Provision Infrastructure
@@ -120,5 +120,5 @@ jobs:
 
       - name: Update Lambda Functions
         run: |
-          aws lambda update-function-code --function-name event_processor --s3-bucket device-raw-data-bucket --s3-key event_processor.zip
-          aws lambda update-function-code --function-name data_statistics --s3-bucket device-raw-data-bucket --s3-key data_statistics.zip
+          aws lambda update-function-code --function-name get --s3-bucket device-raw-data-bucket --s3-key get.zip
+          aws lambda update-function-code --function-name post --s3-bucket device-raw-data-bucket --s3-key post.zip

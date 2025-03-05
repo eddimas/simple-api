@@ -1,20 +1,31 @@
 import json
 import boto3
 import statistics
+from decimal import Decimal
 
 # Initialize DynamoDB client
 dynamodb = boto3.resource('dynamodb')
 DYNAMODB_TABLE = "ProcessedData"
 
+def decimal_default(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError
+
 def lambda_handler(event, context):
-    # Extract device_id from path parameters
-    path_parameters = event.get("pathParameters", {})
-    device_id = path_parameters.get("device_id")
+    # Extract device_id from query parameters
+    query_parameters = event.get("queryStringParameters", {})
+    if not query_parameters:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'message': 'device_id is required as a query parameter'})
+        }
     
+    device_id = query_parameters.get("device_id")
     if not device_id:
         return {
             'statusCode': 400,
-            'body': json.dumps({'message': 'device_id is required as a URL parameter'})
+            'body': json.dumps({'message': 'device_id is required as a query parameter'})
         }
     
     # Query DynamoDB for the device data
@@ -24,7 +35,7 @@ def lambda_handler(event, context):
     )
     
     items = response.get('Items', [])
-    values = [item['value'] for item in items if 'value' in item]
+    values = [float(item['value']) for item in items if 'value' in item]
     
     if not values:
         return {
@@ -44,5 +55,5 @@ def lambda_handler(event, context):
             'mean': mean,
             'median': median,
             'standard_deviation': stdev
-        })
+        }, default=decimal_default)
     }
