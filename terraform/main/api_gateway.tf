@@ -26,6 +26,7 @@ resource "aws_api_gateway_integration" "get_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "GET"
   uri                     = aws_lambda_function.lambda_functions["get"].invoke_arn
+  credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole" # NEW
 }
 
 # Secure POST Method with API Key
@@ -45,6 +46,7 @@ resource "aws_api_gateway_integration" "post_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["post"].invoke_arn
+  credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole" # NEW
 }
 
 
@@ -65,4 +67,5 @@ resource "aws_api_gateway_integration" "delete_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "DELETE"
   uri                     = aws_lambda_function.lambda_functions["delete"].invoke_arn
+  credentials             = "arn:aws:iam::286597764690:role/APIGatewayLambdaInvokeRole" # NEW
 }
