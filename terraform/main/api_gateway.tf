@@ -24,7 +24,7 @@ resource "aws_api_gateway_integration" "get_integration" {
   resource_id             = aws_api_gateway_resource.resource.id
   http_method             = aws_api_gateway_method.get_method.http_method
   type                    = "AWS_PROXY"
-  integration_http_method = "POST"
+  integration_http_method = "GET"
   uri                     = aws_lambda_function.lambda_functions["get"].invoke_arn
 }
 
@@ -45,4 +45,24 @@ resource "aws_api_gateway_integration" "post_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["post"].invoke_arn
+}
+
+
+# Secure DELETE Method with API Key
+resource "aws_api_gateway_method" "delete_method" {
+  rest_api_id      = aws_api_gateway_rest_api.device_event_api.id
+  resource_id      = aws_api_gateway_resource.resource.id
+  http_method      = "DELETE"
+  authorization    = "NONE"
+  api_key_required = true
+}
+
+# Integrate DELETE Method with AWS Lambda
+resource "aws_api_gateway_integration" "delete_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.device_event_api.id
+  resource_id             = aws_api_gateway_resource.resource.id
+  http_method             = aws_api_gateway_method.delete_method.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "DELETE"
+  uri                     = aws_lambda_function.lambda_functions["delete"].invoke_arn
 }
