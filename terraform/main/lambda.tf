@@ -1,5 +1,5 @@
 module "lambda_function" {
-  source = "./modules/lambda_function"
+  source = "${path.module}/modules/lambda_function"
 
   for_each = {
     get    = "get"

@@ -97,6 +97,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Debug Workspace
+        run: pwd && ls -l
+
       - name: Initialize Terraform
         working-directory: terraform/main
         run: terraform init --reconfigure
