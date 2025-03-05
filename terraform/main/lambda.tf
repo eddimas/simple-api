@@ -9,9 +9,9 @@ module "lambda_function" {
 
   function_name = each.key
   runtime       = var.runtime
-  handler       = "device_data.lambda_handler"
+  handler       = "${each.key}/device_data.lambda_handler"
   s3_bucket     = var.bucket_data_name
-  s3_key        = each.value + ".zip"
+  s3_key        = "${each.value}.zip"
   role          = aws_iam_role.lambda_exec.arn
   environment_variables = {
     DYNAMODB_TABLE = aws_dynamodb_table.processed_data.name
