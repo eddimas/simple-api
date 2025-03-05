@@ -57,19 +57,19 @@ jobs:
 
       - name: Install dependencies and package Lambda functions
         run: |
-          mkdir -p lambda/get
-          mkdir -p lambda/post
-          mkdir -p lambda/delete
+          mkdir -p lambda_package/get
+          mkdir -p lambda_package/post
+          mkdir -p lambda_package/delete
 
-          cp lambda/get/device_data.py lambda/get/
-          cp lambda/post/device_data.py lambda/post/
-          cp lambda/post/device_data.py lambda/delete/
+          cp lambda/get/device_data.py lambda_package/get/
+          cp lambda/post/device_data.py lambda_package/post/
+          cp lambda/delete/device_data.py lambda_package/delete/
 
-          pip install -r requirements.txt -t lambda/get/
-          pip install -r requirements.txt -t lambda/post/
-          pip install -r requirements.txt -t lambda/delete/
+          pip install -r requirements.txt -t lambda_package/get/
+          pip install -r requirements.txt -t lambda_package/post/
+          pip install -r requirements.txt -t lambda_package/delete/
 
-          cd lambda/get
+          cd lambda_package/get
           zip -r ../../get.zip .
           cd ../post
           zip -r ../../post.zip .
