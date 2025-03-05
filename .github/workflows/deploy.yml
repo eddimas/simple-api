@@ -128,3 +128,4 @@ jobs:
         run: |
           aws lambda update-function-code --function-name get --s3-bucket device-raw-data-bucket --s3-key get.zip
           aws lambda update-function-code --function-name post --s3-bucket device-raw-data-bucket --s3-key post.zip
+          aws lambda update-function-code --function-name delete --s3-bucket device-raw-data-bucket --s3-key delete.zip
