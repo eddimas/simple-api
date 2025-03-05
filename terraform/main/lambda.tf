@@ -1,12 +1,11 @@
 # Lambda function configurations
-data "aws_lambda_function" "lambda_configs" {
-  for_each      = toset(["get", "post", "delete"])
-  function_name = each.key
+locals {
+  lambda_functions = ["get", "post", "delete"]
 }
 
 # Create Lambda functions recursively
 resource "aws_lambda_function" "lambda_functions" {
-  for_each = data.aws_lambda_function.lambda_configs
+  for_each = toset(local.lambda_functions)
 
   function_name = each.key
   runtime       = "python3.8"
