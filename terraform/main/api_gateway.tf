@@ -33,8 +33,6 @@ resource "aws_api_gateway_stage" "stage" {
     destination_arn = aws_cloudwatch_log_group.api_gw_logs.arn
     format          = "$context.requestId $context.identity.sourceIp $context.httpMethod $context.path $context.status"
   }
-
-  tracing_enabled = true
 }
 
 resource "aws_cloudwatch_log_group" "api_gw_logs" {
