@@ -3,6 +3,9 @@ import boto3
 import datetime
 
 s3 = boto3.client('s3')
+dynamodb = boto3.resource('dynamodb')
+DYNAMODB_TABLE = "ProcessedData"
+S3_BUCKET = "device-raw-data-bucket"
 
 def lambda_handler(event, context):
     # Extract data from the event
@@ -17,18 +20,27 @@ def lambda_handler(event, context):
         }
 
     # Process data (e.g., add a timestamp)
+    timestamp = datetime.datetime.utcnow().isoformat()
     processed_data = {
         'device_id': device_id,
         'value': value,
-        'timestamp': datetime.datetime.utcnow().isoformat()
+        'timestamp': timestamp
     }
 
     # Store processed data in the S3 bucket
     s3.put_object(
-        Bucket='device-raw-data-bucket',
-        Key=f'processed_data/{device_id}_{datetime.datetime.utcnow().isoformat()}.json',
+        Bucket=S3_BUCKET,
+        Key=f'processed_data/{device_id}_{timestamp}.json',
         Body=json.dumps(processed_data)
     )
+
+    # Store processed data in DynamoDB
+    table = dynamodb.Table(DYNAMODB_TABLE)
+    table.put_item(Item={
+        'device_id': device_id,
+        'timestamp': timestamp,
+        'value': value
+    })
 
     return {
         'statusCode': 200,
