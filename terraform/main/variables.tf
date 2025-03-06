@@ -97,8 +97,4 @@ variable "burst_limit" {
   type        = number
   description = "The burst limit for the usage plan"
   default     = 5
-  validation {
-    condition     = var.burst_limit > 0
-    error_message = "The burst limit must be greater than zero."
-  }
 }
