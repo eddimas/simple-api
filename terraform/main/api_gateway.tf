@@ -49,6 +49,47 @@ resource "aws_iam_role" "api_gateway_logging_role" {
 EOF
 }
 
+resource "aws_iam_role" "api_gateway_invoke_role" {
+  name = "api_gateway_invoke_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "api_gateway_invoke_policy" {
+  role = aws_iam_role.api_gateway_invoke_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": [
+        "${aws_lambda_function.lambda_functions["get"].arn}",
+        "${aws_lambda_function.lambda_functions["post"].arn}",
+        "${aws_lambda_function.lambda_functions["delete"].arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+
 resource "aws_iam_role_policy_attachment" "main" {
   role       = aws_iam_role.api_gateway_logging_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
@@ -105,7 +146,7 @@ resource "aws_api_gateway_integration" "get_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["get"].invoke_arn
-  credentials             = aws_iam_role.api_gateway_logging_role.arn
+  credentials             = aws_iam_role.api_gateway_invoke_role.arn
 
   depends_on = [aws_api_gateway_method.get_method]
 }
@@ -127,7 +168,7 @@ resource "aws_api_gateway_integration" "post_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["post"].invoke_arn
-  credentials             = aws_iam_role.api_gateway_logging_role.arn
+  credentials             = aws_iam_role.api_gateway_invoke_role.arn
 
   depends_on = [aws_api_gateway_method.post_method]
 }
@@ -149,7 +190,7 @@ resource "aws_api_gateway_integration" "delete_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.lambda_functions["delete"].invoke_arn
-  credentials             = aws_iam_role.api_gateway_logging_role.arn
+  credentials             = aws_iam_role.api_gateway_invoke_role.arn
 
   depends_on = [aws_api_gateway_method.delete_method]
 }
