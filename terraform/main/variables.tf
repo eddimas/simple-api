@@ -18,7 +18,7 @@ variable "runtime" {
   default = "python3.9"
 }
 
-variable "api_gw_stg_name" {
+variable "stage_name" {
   type    = string
   default = "test"
 }

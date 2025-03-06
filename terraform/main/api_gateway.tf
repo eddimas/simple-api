@@ -1,16 +1,8 @@
-# resource "aws_api_gateway_rest_api" "device_event_api" {
-#   name        = var.api_gw_name
-#   description = var.api_gw_description
-# }
-
 resource "aws_api_gateway_resource" "resource" {
   rest_api_id = aws_api_gateway_rest_api.device_event_api.id
   parent_id   = aws_api_gateway_rest_api.device_event_api.root_resource_id
   path_part   = var.api_gw_path
 }
-
-
-
 
 resource "aws_api_gateway_rest_api" "device_event_api" {
   name        = var.api_gw_name
@@ -25,8 +17,9 @@ resource "aws_api_gateway_account" "apigw_logging" {
   depends_on          = [aws_iam_role.api_gateway_logging_role]
 }
 
-resource "aws_api_gateway_stage" "stage" {
-  stage_name    = var.api_gw_stg_name
+resource "aws_api_gateway_stage" "apigw_stage" {
+  depends_on    = [aws_cloudwatch_log_group.api_gw_logs]
+  stage_name    = var.stage_name
   rest_api_id   = aws_api_gateway_rest_api.device_event_api.id
   deployment_id = aws_api_gateway_deployment.deployment.id
 
@@ -57,6 +50,11 @@ resource "aws_iam_role" "api_gateway_logging_role" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "main" {
+  role       = aws_iam_role.api_gateway_logging_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
 resource "aws_iam_role_policy" "api_gateway_logging_policy" {
@@ -90,34 +88,8 @@ resource "aws_api_gateway_deployment" "deployment" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.device_event_api.id
-  stage_name  = var.api_gw_stg_name
+  stage_name  = var.stage_name
 }
-
-# resource "aws_api_gateway_resource" "resource" {
-#   rest_api_id = aws_api_gateway_rest_api.device_event_api.id
-#   parent_id   = aws_api_gateway_rest_api.device_event_api.root_resource_id
-#   path_part   = var.api_gw_path
-# }
-
-
-
-
-# resource "aws_api_gateway_deployment" "deployment" {
-#   depends_on = [
-#     aws_api_gateway_method.get_method,
-#     aws_api_gateway_method.post_method,
-#     aws_api_gateway_method.delete_method
-#   ]
-
-#   rest_api_id = aws_api_gateway_rest_api.device_event_api.id
-#   stage_name  = var.api_gw_stg_name
-# }
-
-
-
-
-
-
 
 # Secure GET Method with API Key
 resource "aws_api_gateway_method" "get_method" {
@@ -183,4 +155,16 @@ resource "aws_api_gateway_integration" "delete_integration" {
   credentials             = aws_iam_role.api_gateway_logging_role.arn
 
   depends_on = [aws_api_gateway_method.delete_method]
+}
+
+
+resource "aws_api_gateway_method_settings" "device_event_settings" {
+  rest_api_id = aws_api_gateway_rest_api.device_event_api.id
+  stage_name  = aws_api_gateway_stage.apigw_stage.stage_name
+  method_path = "*/*"
+  settings {
+    logging_level      = "INFO"
+    data_trace_enabled = true
+    metrics_enabled    = true
+  }
 }

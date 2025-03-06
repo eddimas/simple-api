@@ -12,7 +12,7 @@ resource "aws_api_gateway_usage_plan" "api_usage_plan" {
 
   api_stages {
     api_id = aws_api_gateway_rest_api.device_event_api.id
-    stage  = var.api_gw_stg_name
+    stage  = var.stage_name
   }
 
   throttle_settings {
