@@ -16,7 +16,7 @@ The system is designed with best practices for Infrastructure as Code (IaC), CI/
 
 ### 1. Ingest Device Data
 
-**Endpoint:** `POST /data`  
+**Endpoint:** `POST /test/api`  
 **Description:** Accepts event data from simulated devices and validates the input  
 **Request Headers:** `x-api-key: ${SECRET-KEY}$`
 **Request Body (JSON Example)**
@@ -38,7 +38,7 @@ The system is designed with best practices for Infrastructure as Code (IaC), CI/
 
 ### 2. Retrieve Processed Data
 
-**Endpoint:** `GET /`  
+**Endpoint:** `GET /test/api?device_id=125`  
 **Description:** Fetches processed data for a specific device from .  
 **Request Headers:** `x-api-key: ${SECRET-KEY}$`
 **Response Example:**
@@ -49,6 +49,22 @@ Method response body after transformations: {"mean": 66, "median": 40, "standard
 
 - `200 OK`: Returns processed data.
 - `404 Not Found`: No data found for the specified device.
+
+---
+
+### 3. Delete Data
+
+**Endpoint:** `DELETE /test/api?device_id=125&value=245`  
+**Description:** Delete data for a specific device from dynamodb.  
+**Request Headers:** `x-api-key: ${SECRET-KEY}$`
+**Response Example:**
+
+```json
+{ "message": "Item successfully deleted" }
+```
+
+- `200 OK`: Returns processed data.
+- `404 Not Found`: No matching item found for deletion.
 
 ---
 
