@@ -87,10 +87,6 @@ variable "rate_limit" {
   type        = number
   description = "The rate limit for the usage plan"
   default     = 10
-  validation {
-    condition     = var.rate_limit > 0
-    error_message = "Rate limit must be greater than 0"
-  }
 }
 
 variable "burst_limit" {
