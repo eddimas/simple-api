@@ -129,3 +129,7 @@ jobs:
           aws lambda update-function-code --function-name get --s3-bucket device-raw-data-bucket --s3-key get.zip
           aws lambda update-function-code --function-name post --s3-bucket device-raw-data-bucket --s3-key post.zip
           aws lambda update-function-code --function-name delete --s3-bucket device-raw-data-bucket --s3-key delete.zip
+
+      - name: Redeploy the apigw stage
+        working-directory: terraform/main
+        run: aws apigateway create-deployment --rest-api-id mkfluja5f7 --stage-name test

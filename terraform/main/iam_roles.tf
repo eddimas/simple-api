@@ -110,7 +110,8 @@ resource "aws_iam_policy" "lambda_dynamodb_policy" {
         "dynamodb:PutItem",
         "dynamodb:UpdateItem",
         "dynamodb:Scan",
-        "dynamodb:Query"
+        "dynamodb:Query",
+        "dynamodb:DescribeTable"
       ]
       Resource = "${aws_dynamodb_table.processed_data.arn}"
     }]
