@@ -1,9 +1,4 @@
-resource "aws_api_gateway_resource" "resource" {
-  rest_api_id = aws_api_gateway_rest_api.device_event_api.id
-  parent_id   = aws_api_gateway_rest_api.device_event_api.root_resource_id
-  path_part   = var.api_gw_path
-}
-
+# API Gateway REST API
 resource "aws_api_gateway_rest_api" "device_event_api" {
   name        = var.api_gw_name
   description = var.api_gw_description
@@ -12,11 +7,20 @@ resource "aws_api_gateway_rest_api" "device_event_api" {
   }
 }
 
+# API Gateway Resource
+resource "aws_api_gateway_resource" "resource" {
+  rest_api_id = aws_api_gateway_rest_api.device_event_api.id
+  parent_id   = aws_api_gateway_rest_api.device_event_api.root_resource_id
+  path_part   = var.api_gw_path
+}
+
+# API Gateway Account for CloudWatch Logging
 resource "aws_api_gateway_account" "apigw_logging" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_logging_role.arn
   depends_on          = [aws_iam_role.api_gateway_logging_role]
 }
 
+# API Gateway Stage
 resource "aws_api_gateway_stage" "apigw_stage" {
   depends_on    = [aws_cloudwatch_log_group.api_gw_logs]
   stage_name    = var.stage_name
@@ -29,95 +33,13 @@ resource "aws_api_gateway_stage" "apigw_stage" {
   }
 }
 
-
-resource "aws_iam_role" "api_gateway_logging_role" {
-  name = "api_gateway_logging_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role" "api_gateway_invoke_role" {
-  name = "api_gateway_invoke_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "api_gateway_invoke_policy" {
-  role = aws_iam_role.api_gateway_invoke_role.id
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "lambda:InvokeFunction",
-      "Resource": [
-        "${aws_lambda_function.lambda_functions["get"].arn}",
-        "${aws_lambda_function.lambda_functions["post"].arn}",
-        "${aws_lambda_function.lambda_functions["delete"].arn}"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-
+# IAM Role Policy Attachment for API Gateway Logging
 resource "aws_iam_role_policy_attachment" "main" {
   role       = aws_iam_role.api_gateway_logging_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 }
 
-resource "aws_iam_role_policy" "api_gateway_logging_policy" {
-  role = aws_iam_role.api_gateway_logging_role.id
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams"
-      ],
-      "Resource": "arn:aws:logs:*:*:*"
-    }
-  ]
-}
-EOF
-}
-
+# API Gateway Deployment
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
     aws_api_gateway_method.get_method,
@@ -195,7 +117,7 @@ resource "aws_api_gateway_integration" "delete_integration" {
   depends_on = [aws_api_gateway_method.delete_method]
 }
 
-
+# API Gateway Method Settings
 resource "aws_api_gateway_method_settings" "device_event_settings" {
   rest_api_id = aws_api_gateway_rest_api.device_event_api.id
   stage_name  = aws_api_gateway_stage.apigw_stage.stage_name
