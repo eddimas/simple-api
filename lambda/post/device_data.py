@@ -1,59 +1,48 @@
 import json
 import boto3
-import statistics
-from decimal import Decimal
+import datetime
 
-# Initialize DynamoDB client
+s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 DYNAMODB_TABLE = "ProcessedData"
-
-def decimal_default(obj):
-    if isinstance(obj, Decimal):
-        return float(obj)
-    raise TypeError
+S3_BUCKET = "device-raw-data-bucket"
 
 def lambda_handler(event, context):
-    # Extract device_id from query parameters
-    query_parameters = event.get("queryStringParameters", {})
-    if not query_parameters:
+    # Extract data from the event
+    body = json.loads(event.get('body', '{}'))
+    device_id = body.get('device_id')
+    value = body.get('value')
+
+    if not device_id or not value:
         return {
             'statusCode': 400,
-            'body': json.dumps({'message': 'device_id is required as a query parameter'})
+            'body': json.dumps({'message': 'device_id and value are required'})
         }
-    
-    device_id = query_parameters.get("device_id")
-    if not device_id:
-        return {
-            'statusCode': 400,
-            'body': json.dumps({'message': 'device_id is required as a query parameter'})
-        }
-    
-    # Query DynamoDB for the device data
-    table = dynamodb.Table(DYNAMODB_TABLE)
-    response = table.query(
-        KeyConditionExpression=boto3.dynamodb.conditions.Key('device_id').eq(device_id)
+
+    # Process data (e.g., add a timestamp)
+    timestamp = datetime.datetime.utcnow().isoformat()
+    processed_data = {
+        'device_id': device_id,
+        'value': value,
+        'timestamp': timestamp
+    }
+
+    # Store processed data in the S3 bucket
+    s3.put_object(
+        Bucket=S3_BUCKET,
+        Key=f'processed_data/{device_id}_{timestamp}.json',
+        Body=json.dumps(processed_data)
     )
-    
-    items = response.get('Items', [])
-    values = [float(item['value']) for item in items if 'value' in item]
-    
-    if not values:
-        return {
-            'statusCode': 404,
-            'body': json.dumps({'message': 'No data found for the given device_id'})
-        }
-    
-    # Calculate statistics
-    mean = statistics.mean(values)
-    median = statistics.median(values)
-    stdev = statistics.stdev(values) if len(values) > 1 else 0
-    
+
+    # Store processed data in DynamoDB
+    table = dynamodb.Table(DYNAMODB_TABLE)
+    table.put_item(Item={
+        'device_id': device_id,
+        'timestamp': timestamp,
+        'value': value
+    })
+
     return {
         'statusCode': 200,
-        'body': json.dumps({
-            'device_id': device_id,
-            'mean': mean,
-            'median': median,
-            'standard_deviation': stdev
-        }, default=decimal_default)
+        'body': json.dumps({'message': 'Data processed and stored successfully'})
     }

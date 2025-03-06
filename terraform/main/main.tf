@@ -42,7 +42,11 @@ resource "aws_iam_policy" "lambda_dynamodb_policy" {
     {
       "Effect": "Allow",
       "Action": [
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
         "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:Scan",
         "dynamodb:Query"
       ],
       "Resource": "${aws_dynamodb_table.processed_data.arn}"
