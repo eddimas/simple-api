@@ -107,10 +107,6 @@ jobs:
         working-directory: terraform/main
         run: terraform init
 
-      - name: Import stage
-        working-directory: terraform/main
-        run: terraform import aws_api_gateway_stage.stage mkfluja5f7/test
-
       - name: Apply Terraform
         working-directory: terraform/main
         run: terraform apply -auto-approve
