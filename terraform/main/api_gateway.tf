@@ -70,7 +70,9 @@ resource "aws_iam_role_policy" "api_gateway_logging_policy" {
       "Action": [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
-        "logs:PutLogEvents"
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
       ],
       "Resource": "arn:aws:logs:*:*:*"
     }
