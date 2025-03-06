@@ -58,6 +58,12 @@ variable "dynamodb_table_hash_key" {
   default     = "device_id"
 }
 
+variable "dynamodb_table_sort_key" {
+  type        = string
+  description = "The hash key for the DynamoDB table"
+  default     = "timestamp"
+}
+
 # Variables for API Key and Usage Plan
 variable "api_key_name" {
   type        = string
