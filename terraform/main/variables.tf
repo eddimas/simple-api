@@ -99,6 +99,6 @@ variable "burst_limit" {
   default     = 5
   validation {
     condition     = var.burst_limit > 0
-    error_message = "Burst limit must be greater than 0"
+    error_message = "The burst limit must be greater than zero."
   }
 }
