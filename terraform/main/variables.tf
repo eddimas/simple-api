@@ -100,3 +100,8 @@ variable "burst_limit" {
   description = "The burst limit for the usage plan"
   default     = 5
 }
+
+variable "device_raw_data_bucket" {
+  type    = string
+  default = "device-raw-data-bucket"
+}
