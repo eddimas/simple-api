@@ -60,14 +60,20 @@ jobs:
           mkdir -p lambda_package/get
           mkdir -p lambda_package/post
           mkdir -p lambda_package/delete
+          mkdir -p lambda_package/extract_transform
+          mkdir -p lambda_package/load
 
           cp lambda/get/device_data.py lambda_package/get/
           cp lambda/post/device_data.py lambda_package/post/
           cp lambda/delete/device_data.py lambda_package/delete/
+          cp lambda/extract_transform/device_data.py lambda_package/extract_transform/
+          cp lambda/load/device_data.py lambda_package/load/
 
           pip install -r requirements.txt -t lambda_package/get/
           pip install -r requirements.txt -t lambda_package/post/
           pip install -r requirements.txt -t lambda_package/delete/
+          pip install -r requirements.txt -t lambda_package/extract_transform/
+          pip install -r requirements.txt -t lambda_package/load/
 
           cd lambda_package/get
           zip -r ../../get.zip .
@@ -75,12 +81,19 @@ jobs:
           zip -r ../../post.zip .
           cd ../delete
           zip -r ../../delete.zip .
+          cd ../extract_transform
+          zip -r ../../extract_transform.zip .
+          cd ../load
+          zip -r ../../load.zip .
+          cd ../..
 
       - name: Upload Lambda ZIPs to S3
         run: |
           aws s3 cp get.zip s3://device-raw-data-bucket/
           aws s3 cp post.zip s3://device-raw-data-bucket/
           aws s3 cp delete.zip s3://device-raw-data-bucket/
+          aws s3 cp extract_transform.zip s3://device-raw-data-bucket/
+          aws s3 cp load.zip s3://device-raw-data-bucket/
 
   terraform:
     name: Provision Infrastructure
@@ -129,6 +142,8 @@ jobs:
           aws lambda update-function-code --function-name get --s3-bucket device-raw-data-bucket --s3-key get.zip
           aws lambda update-function-code --function-name post --s3-bucket device-raw-data-bucket --s3-key post.zip
           aws lambda update-function-code --function-name delete --s3-bucket device-raw-data-bucket --s3-key delete.zip
+          aws lambda update-function-code --function-name extract_transform --s3-bucket device-raw-data-bucket --s3-key extract_transform.zip
+          aws lambda update-function-code --function-name load --s3-bucket device-raw-data-bucket --s3-key load.zip
 
       - name: Redeploy the apigw stage
         run: aws apigateway create-deployment --rest-api-id mkfluja5f7 --stage-name test
