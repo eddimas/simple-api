@@ -47,5 +47,5 @@ resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.s3_processor.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.device_csv_data_bucket.arn
+  source_arn    = var.device_csv_data_bucket.arn
 }
