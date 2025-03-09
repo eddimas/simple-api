@@ -21,34 +21,3 @@ resource "aws_lambda_function" "lambda_functions" {
   }
 }
 
-resource "aws_lambda_function" "s3_processor" {
-  function_name = "extract_transform"
-  runtime       = var.runtime
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "extract_transform.lambda_handler"
-  s3_bucket     = var.bucket_data_name
-  //filename      = "lambda_function.zip"
-  s3_key  = "extract_transform.zip"
-  timeout = 30
-  environment {
-    variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.event_notifications.arn
-    }
-  }
-}
-
-resource "aws_lambda_function" "sns_to_dynamodb" {
-  function_name = "load"
-  runtime       = var.runtime
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "load.lambda_handler"
-  s3_bucket     = var.bucket_data_name
-  //filename      = "lambda_function.zip"
-  s3_key  = "load.zip"
-  timeout = 30
-  environment {
-    variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.processed_data.name
-    }
-  }
-}
