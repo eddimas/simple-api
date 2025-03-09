@@ -31,7 +31,9 @@ resource "aws_lambda_function" "sns_to_dynamodb" {
   }
 }
 
-
+data "aws_s3_bucket" "device_csv_data_bucket" {
+  bucket = var.device_csv_data_bucket
+}
 
 resource "aws_s3_bucket_notification" "s3_event_trigger" {
   bucket = var.device_csv_data_bucket
@@ -47,5 +49,5 @@ resource "aws_lambda_permission" "allow_s3" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.s3_processor.function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = var.device_csv_data_bucket.arn
+  source_arn    = data.aws_s3_bucket.device_csv_data_bucket.arn
 }
