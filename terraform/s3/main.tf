@@ -34,13 +34,7 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-
-data "aws_s3_bucket" "s3_event_trigger" {
-  bucket = var.device_csv_data_bucket
-}
-
 resource "aws_s3_bucket" "device_raw_data_bucket" {
-  count         = length(data.aws_s3_bucket.s3_event_trigger.id) == 0 ? 1 : 0
   bucket        = var.device_csv_data_bucket
   force_destroy = true
 
@@ -50,5 +44,9 @@ resource "aws_s3_bucket" "device_raw_data_bucket" {
     expiration {
       days = 30
     }
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
