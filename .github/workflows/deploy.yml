@@ -120,10 +120,6 @@ jobs:
         working-directory: terraform/main
         run: terraform init
 
-      - name: Import S3 Bucket
-        working-directory: terraform/main
-        run: terraform import aws_s3_bucket.device_csv_data_bucket device-csv-data-bucket
-
       - name: Apply Terraform
         working-directory: terraform/main
         run: terraform apply -auto-approve
