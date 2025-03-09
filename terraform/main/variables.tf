@@ -101,7 +101,7 @@ variable "burst_limit" {
   default     = 5
 }
 
-variable "device_raw_data_bucket" {
+variable "device_csv_data_bucket" {
   type    = string
   default = "device-raw-data-bucket"
 }

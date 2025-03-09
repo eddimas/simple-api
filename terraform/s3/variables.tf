@@ -8,7 +8,7 @@ variable "bucket_tfstate_name" {
   default = "terraform-20250227182101774700000002"
 }
 
-variable "device_raw_data_bucket" {
+variable "device_csv_data_bucket" {
   type    = string
   default = "device-raw-data-bucket"
 }
