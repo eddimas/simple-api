@@ -10,5 +10,5 @@ variable "bucket_tfstate_name" {
 
 variable "device_csv_data_bucket" {
   type    = string
-  default = "device-raw-data-bucket"
+  default = "device-csv-data-bucket"
 }
