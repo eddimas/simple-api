@@ -96,3 +96,25 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_read_attach" {
   policy_arn = aws_iam_policy.lambda_s3_read_policy.arn
   role       = aws_iam_role.lambda_exec.name
 }
+
+
+resource "aws_iam_policy" "lambda_sns_publish_policy" {
+  name        = "lambda_sns_publish_policy"
+  description = "Allows Lambda to publish messages to SNS topic"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sns:Publish"
+        Resource = aws_sns_topic.event_notifications.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_sns_publish_attach" {
+  policy_arn = aws_iam_policy.lambda_sns_publish_policy.arn
+  role       = aws_iam_role.lambda_exec.name
+}
