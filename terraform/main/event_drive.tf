@@ -73,3 +73,26 @@ resource "aws_lambda_permission" "allow_sns" {
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.event_notifications.arn
 }
+
+
+
+resource "aws_iam_policy" "lambda_s3_read_policy" {
+  name        = "lambda_s3_read_policy"
+  description = "Allows Lambda to read objects from S3 bucket"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetObject"]
+        Resource = "arn:aws:s3:::${var.device_csv_data_bucket}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_read_attach" {
+  policy_arn = aws_iam_policy.lambda_s3_read_policy.arn
+  role       = aws_iam_role.lambda_exec.name
+}
