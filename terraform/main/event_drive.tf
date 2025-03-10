@@ -3,39 +3,6 @@ data "aws_s3_bucket" "device_csv_data_bucket" {
   bucket = var.device_csv_data_bucket
 }
 
-# Lambda Function: Extract & Transform (Triggered by S3)
-resource "aws_lambda_function" "extract_transform" {
-  function_name = "extract_transform"
-  runtime       = var.runtime
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "device_data.lambda_handler"
-  s3_bucket     = var.bucket_data_name
-  s3_key        = "extract_transform.zip"
-  timeout       = 30
-
-  environment {
-    variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.event_notifications.arn
-    }
-  }
-}
-
-# Lambda Function: Load (Triggered by SNS and writes to DynamoDB)
-resource "aws_lambda_function" "load" {
-  function_name = "load"
-  runtime       = var.runtime
-  role          = aws_iam_role.lambda_exec.arn
-  handler       = "device_data.lambda_handler"
-  s3_bucket     = var.bucket_data_name
-  s3_key        = "load.zip"
-  timeout       = 30
-
-  environment {
-    variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.processed_data.name
-    }
-  }
-}
 
 # Lambda Permission to Allow S3 to Invoke extract_transform Function
 resource "aws_lambda_permission" "allow_s3" {
