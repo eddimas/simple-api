@@ -8,7 +8,7 @@ resource "aws_lambda_function" "extract_transform" {
   function_name = "extract_transform"
   runtime       = var.runtime
   role          = aws_iam_role.lambda_exec.arn
-  handler       = "extract_transform.lambda_handler"
+  handler       = "device_data.lambda_handler"
   s3_bucket     = var.bucket_data_name
   s3_key        = "extract_transform.zip"
   timeout       = 30
@@ -25,7 +25,7 @@ resource "aws_lambda_function" "load" {
   function_name = "load"
   runtime       = var.runtime
   role          = aws_iam_role.lambda_exec.arn
-  handler       = "load.lambda_handler"
+  handler       = "device_data.lambda_handler"
   s3_bucket     = var.bucket_data_name
   s3_key        = "load.zip"
   timeout       = 30
